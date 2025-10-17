@@ -16,8 +16,8 @@ export default function TabLayout() {
           justifyContent: "center",
           alignItems: "center",
           paddingTop: 10,
-          borderTopWidth: 1.5,
-          borderTopColor: Colors.textSecondary,
+          borderTopWidth: 0.5,
+          borderTopColor: Colors.separator,
         },
       }}
     >
