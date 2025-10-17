@@ -9,10 +9,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Welcome, Five20TECH  
-        {/* Add your custom welcome message here */}
-        This is the Index screen.
-      </Text>
+      <Text> Home Screen </Text>
     </View>
   );
 }
