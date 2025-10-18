@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import useThemedColor from "./../../Hooks/useThemedColor";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -20,7 +26,11 @@ export default function Index() {
             <View
               style={[styles.headerIcon, { backgroundColor: Colors.primary }]}
             >
-              <Ionicons name="flash-outline" size={30} color={"#9ab6c7ff"} />
+              <Ionicons
+                name="flash-outline"
+                size={30}
+                color={Colors.textPrimary}
+              />
             </View>
             <View>
               <View style={styles.headerTitleWrapper}>
@@ -73,6 +83,40 @@ export default function Index() {
               </Text>
             </View>
           </View>
+
+          {/** HEADER TODO ADD */}
+          <View style={styles.inputContainer}>
+            <View
+              style={[
+                styles.inputFieldWrapper,
+                {
+                  borderColor: Colors.outline,
+                  backgroundColor: Colors.surface,
+                },
+              ]}
+            >
+              <TextInput
+                placeholder="What needs to be done?"
+                placeholderTextColor={Colors.textSecondary}
+                style={[
+                  {
+                    color: Colors.textPrimary,
+                  },
+                  styles.inputField,
+                ]}
+              />
+            </View>
+            <View
+              style={[
+                styles.inputButtonWrapper,
+                { backgroundColor: Colors.surface },
+              ]}
+            >
+              <TouchableOpacity activeOpacity={0.5}>
+                <Ionicons name="add" size={25} color={Colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -118,5 +162,28 @@ const styles = StyleSheet.create({
     width: "85%",
     height: 13,
     borderRadius: 10,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+  },
+  inputFieldWrapper: {
+    flex: 1,
+    borderWidth: 2,
+    borderRadius: 20,
+    height: 60,
+  },
+  inputField: {
+    fontSize: 18,
+    height: "100%",
+    paddingHorizontal: 20,
+  },
+  inputButtonWrapper: {
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

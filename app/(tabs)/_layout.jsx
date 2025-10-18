@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import useThemedColor from "../../Hooks/useThemedColor";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function TabLayout() {
   const [Colors] = useThemedColor();
@@ -17,7 +17,7 @@ export default function TabLayout() {
           alignItems: "center",
           paddingTop: 10,
           borderTopWidth: 0.5,
-          borderTopColor: Colors.separator,
+          borderTopColor: Colors.outline,
         },
       }}
     >
