@@ -1,11 +1,21 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import useThemedColor from "../Hooks/useThemedColor";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+} from "react-native";
+import { useState } from "react";
 
-import { toggleTodoCompletion, deleteTodo } from "../lib/appwrite";
+import useThemedColor from "../Hooks/useThemedColor";
+import { toggleTodoCompletion, deleteTodo, updateTodo } from "../lib/appwrite";
 
 const TodoCard = ({ todo, setTodos }) => {
   const [Colors] = useThemedColor();
+  const [editingId, setEditingId] = useState("");
+  const [newTitle, setNewTitle] = useState(todo.title);
 
   //Toggle todo completion with debounce
   let debounce;
@@ -35,6 +45,22 @@ const TodoCard = ({ todo, setTodos }) => {
     }
   };
 
+  //Handle todo edit
+  const handleEdit = async () => {
+    if (newTitle.trim() === todo.title.trim() || !newTitle.trim()) {
+      setEditingId("");
+      return;
+    }
+    try {
+      const res = await updateTodo(todo.$id, newTitle);
+      setTodos((prev) => prev.map((p) => (p.$id === todo.$id ? res : p)));
+      setEditingId("");
+    } catch (error) {
+      Alert.alert("Error", "Failed to edit todo");
+      console.error("Error editing todo:", error);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: Colors.surface }]}>
       {/** Completed Indicator */}
@@ -57,49 +83,127 @@ const TodoCard = ({ todo, setTodos }) => {
       <View
         style={{
           gap: 20,
+          flex: 1,
         }}
       >
-        <Text>
-          <Text
-            style={{
-              color: todo.completed ? Colors.textSecondary : Colors.textPrimary,
-              fontSize: 18,
-              textDecorationLine: todo.completed ? "line-through" : "none",
-            }}
-          >
-            {todo.title}
-          </Text>
-        </Text>
-        <View style={styles.btnsContainer}>
-          <TouchableOpacity>
+        {editingId === todo.$id ? (
+          <>
+            <View
+              style={[
+                styles.editContainer,
+                {
+                  borderColor: Colors.primary,
+                  backgroundColor: Colors.bgPrimary,
+                },
+              ]}
+            >
+              <TextInput
+                style={{
+                  flex: 1,
+                  color: Colors.textPrimary,
+                  padding: 15,
+                  fontSize: 18,
+                }}
+                value={newTitle}
+                onChangeText={setNewTitle}
+                onSubmitEditing={handleEdit}
+              />
+            </View>
             <View
               style={{
-                height: 40,
-                width: 40,
-                borderRadius: 100,
-                backgroundColor: Colors.secondary,
-                justifyContent: "center",
-                alignItems: "center",
+                flexDirection: "row",
+                gap: 15,
               }}
             >
-              <MaterialIcons name="edit" size={15} color={"#F8FAFC"} />
+              <TouchableOpacity onPress={handleEdit}>
+                <View
+                  style={[
+                    styles.editBtn,
+                    {
+                      backgroundColor: Colors.accent,
+                    },
+                  ]}
+                >
+                  <Ionicons name="checkmark" size={15} color={"#F8FAFC"} />
+                  <Text
+                    style={{
+                      color: Colors.textPrimary,
+                      fontSize: 16,
+                    }}
+                  >
+                    Save
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setEditingId("")}>
+                <View
+                  style={[
+                    styles.editBtn,
+                    {
+                      backgroundColor: Colors.secondary,
+                    },
+                  ]}
+                >
+                  <Ionicons name="close" size={15} color={"#F8FAFC"} />
+                  <Text
+                    style={{
+                      color: Colors.textPrimary,
+                      fontSize: 16,
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleDelete}>
-            <View
-              style={{
-                height: 40,
-                width: 40,
-                borderRadius: 100,
-                backgroundColor: Colors.delete,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <MaterialIcons name="delete" size={15} color={"#F8FAFC"} />
+          </>
+        ) : (
+          <>
+            <View>
+              <Text
+                style={{
+                  color: todo.completed
+                    ? Colors.textSecondary
+                    : Colors.textPrimary,
+                  fontSize: 18,
+                  textDecorationLine: todo.completed ? "line-through" : "none",
+                }}
+              >
+                {todo.title}
+              </Text>
             </View>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.btnsContainer}>
+              <TouchableOpacity onPress={() => setEditingId(todo.$id)}>
+                <View
+                  style={{
+                    height: 40,
+                    width: 40,
+                    borderRadius: 100,
+                    backgroundColor: Colors.secondary,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons name="edit" size={15} color={"#F8FAFC"} />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDelete}>
+                <View
+                  style={{
+                    height: 40,
+                    width: 40,
+                    borderRadius: 100,
+                    backgroundColor: Colors.delete,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <MaterialIcons name="delete" size={15} color={"#F8FAFC"} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
@@ -127,5 +231,19 @@ const styles = StyleSheet.create({
   btnsContainer: {
     flexDirection: "row",
     gap: 15,
+  },
+  editContainer: {
+    height: 50,
+    borderRadius: 15,
+    borderWidth: 2,
+  },
+  editBtn: {
+    flexDirection: "row",
+    paddingHorizontal: 15,
+    gap: 2,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
