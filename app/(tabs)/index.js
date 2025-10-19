@@ -1,5 +1,6 @@
 import {
   Alert,
+  FlatList,
   StyleSheet,
   Text,
   TextInput,
@@ -10,12 +11,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import useThemedColor from "./../../Hooks/useThemedColor";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { addTodo } from "../../lib/appwrite";
-import { useState } from "react";
+import { addTodo, getTodos } from "../../lib/appwrite";
+import { useEffect, useState } from "react";
+import TodoCard from "../../components/TodoCard";
 
 export default function Index() {
   const [Colors] = useThemedColor();
   const [title, setTitle] = useState("");
+  const [todos, setTodos] = useState([]);
 
   /** Handles Todo Add */
   const TodoAdd = async () => {
@@ -33,6 +36,21 @@ export default function Index() {
     }
   };
 
+  useEffect(() => {
+    // Fetch todos from database when component mounts
+    const fetchTodos = async () => {
+      try {
+        const res = await getTodos();
+        setTodos(res);
+        console.log(res);
+      } catch (error) {
+        console.error("Error fetching todos:", error);
+      }
+    };
+
+    fetchTodos();
+  }, []);
+
   return (
     <LinearGradient
       colors={[Colors.bgPrimary, Colors.bgSecondary]}
@@ -46,11 +64,7 @@ export default function Index() {
             <View
               style={[styles.headerIcon, { backgroundColor: Colors.primary }]}
             >
-              <Ionicons
-                name="flash-outline"
-                size={30}
-                color={Colors.textPrimary}
-              />
+              <Ionicons name="flash-outline" size={30} color={"#F8FAFC"} />
             </View>
             <View>
               <View style={styles.headerTitleWrapper}>
@@ -141,6 +155,17 @@ export default function Index() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/** TODO LIST SECTION */}
+        <FlatList
+          data={todos}
+          keyExtractor={(item) => item.$id}
+          renderItem={({ item }) => <TodoCard todo={item} />}
+          contentContainerStyle={{
+            paddingTop: 20,
+          }}
+          showsVerticalScrollIndicator={false}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

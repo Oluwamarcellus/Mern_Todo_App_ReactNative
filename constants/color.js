@@ -45,7 +45,7 @@ export const darkTheme = {
   bgPrimary: "#111827", // deeper neutral base (true dark)
   bgSecondary: "#1F2937", // slightly lighter contrast from bgPrimary
   surface: "#2D3748", // clear elevation difference for cards/modals
-  textPrimary: "#F8FAFC", // unchanged
+  textPrimary: "#e3eaf0f3", // unchanged
   textSecondary: "#94A3B8", // unchanged
   delete: "#EF4444", // slightly stronger to match light version’s tone
   outline: "#475569", // subtle but visible border contrast
