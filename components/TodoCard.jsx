@@ -1,14 +1,33 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import useThemedColor from "../Hooks/useThemedColor";
 
-const TodoCard = ({ todo }) => {
+import { toggleTodoCompletion } from "../lib/appwrite";
+
+const TodoCard = ({ todo, setTodos }) => {
   const [Colors] = useThemedColor();
 
+  let debounce;
+  const handleToggle = async () => {
+    try {
+      // The debounce logic prevents multiple rapid toggle calls
+      // when user taps quickly
+      if (debounce) clearTimeout(debounce);
+      debounce = setTimeout(async () => {
+        const res = await toggleTodoCompletion(todo.$id, !todo.completed);
+        console.log("Done");
+
+        setTodos((prev) => prev.map((p) => (p.$id === todo.$id ? res : p)));
+      }, 500);
+    } catch (error) {
+      Alert.alert("Error", "Failed to toggle todo completion");
+      console.error("Error toggling todo completion:", error);
+    }
+  };
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: Colors.surface }]}>
       {/** Completed Indicator */}
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleToggle}>
         <View
           style={[
             styles.completedBar,
@@ -30,7 +49,13 @@ const TodoCard = ({ todo }) => {
         }}
       >
         <Text>
-          <Text style={{ color: Colors.textPrimary, fontSize: 18 }}>
+          <Text
+            style={{
+              color: todo.completed ? Colors.textSecondary : Colors.textPrimary,
+              fontSize: 18,
+              textDecorationLine: todo.completed ? "line-through" : "none",
+            }}
+          >
             {todo.title}
           </Text>
         </Text>
@@ -77,7 +102,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingHorizontal: 20,
     paddingVertical: 28,
-    backgroundColor: "#1E293B",
     borderRadius: 25,
     marginVertical: 12,
     gap: 20,

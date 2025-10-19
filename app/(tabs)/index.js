@@ -160,7 +160,9 @@ export default function Index() {
         <FlatList
           data={todos}
           keyExtractor={(item) => item.$id}
-          renderItem={({ item }) => <TodoCard todo={item} />}
+          renderItem={({ item }) => (
+            <TodoCard todo={item} setTodos={setTodos} />
+          )}
           contentContainerStyle={{
             paddingTop: 20,
           }}
