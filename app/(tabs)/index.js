@@ -1,6 +1,7 @@
 import {
   Alert,
   FlatList,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
@@ -22,13 +23,14 @@ export default function Index() {
 
   /** Handles Todo Add */
   const TodoAdd = async () => {
+    Keyboard.dismiss();
     if (!title.trim()) {
       Alert.alert("Error", "Todo title cannot be empty");
     } else {
       try {
-        await addTodo(title);
+        const res = await addTodo(title);
         setTitle("");
-        Alert.alert("Success", "Todo added successfully");
+        setTodos((prev) => [res, ...prev]);
       } catch (error) {
         Alert.alert("Error", "Failed to add todo");
         console.error("Error adding todo:", error);
