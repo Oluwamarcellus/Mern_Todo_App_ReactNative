@@ -2,11 +2,12 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import useThemedColor from "../Hooks/useThemedColor";
 
-import { toggleTodoCompletion } from "../lib/appwrite";
+import { toggleTodoCompletion, deleteTodo } from "../lib/appwrite";
 
 const TodoCard = ({ todo, setTodos }) => {
   const [Colors] = useThemedColor();
 
+  //Toggle todo completion with debounce
   let debounce;
   const handleToggle = async () => {
     try {
@@ -15,8 +16,6 @@ const TodoCard = ({ todo, setTodos }) => {
       if (debounce) clearTimeout(debounce);
       debounce = setTimeout(async () => {
         const res = await toggleTodoCompletion(todo.$id, !todo.completed);
-        console.log("Done");
-
         setTodos((prev) => prev.map((p) => (p.$id === todo.$id ? res : p)));
       }, 500);
     } catch (error) {
@@ -24,6 +23,18 @@ const TodoCard = ({ todo, setTodos }) => {
       console.error("Error toggling todo completion:", error);
     }
   };
+
+  // Handle todo deletion
+  const handleDelete = async () => {
+    try {
+      await deleteTodo(todo.$id);
+      setTodos((prev) => prev.filter((p) => p.$id !== todo.$id));
+    } catch (error) {
+      Alert.alert("Error", "Failed to delete todo");
+      console.error("Error deleting todo:", error);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: Colors.surface }]}>
       {/** Completed Indicator */}
@@ -74,7 +85,7 @@ const TodoCard = ({ todo, setTodos }) => {
               <MaterialIcons name="edit" size={15} color={"#F8FAFC"} />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleDelete}>
             <View
               style={{
                 height: 40,
