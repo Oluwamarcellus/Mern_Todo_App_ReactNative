@@ -45,3 +45,7 @@ app-example
 # environments files
 .env
 .env.local
+
+# Vs code
+.vscode/
+/.vscode

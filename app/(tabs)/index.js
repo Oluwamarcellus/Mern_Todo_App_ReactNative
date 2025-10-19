@@ -1,4 +1,5 @@
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -9,9 +10,28 @@ import { LinearGradient } from "expo-linear-gradient";
 import useThemedColor from "./../../Hooks/useThemedColor";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { addTodo } from "../../lib/appwrite";
+import { useState } from "react";
 
 export default function Index() {
   const [Colors] = useThemedColor();
+  const [title, setTitle] = useState("");
+
+  /** Handles Todo Add */
+  const TodoAdd = async () => {
+    if (!title.trim()) {
+      Alert.alert("Error", "Todo title cannot be empty");
+    } else {
+      try {
+        await addTodo(title);
+        setTitle("");
+        Alert.alert("Success", "Todo added successfully");
+      } catch (error) {
+        Alert.alert("Error", "Failed to add todo");
+        console.error("Error adding todo:", error);
+      }
+    }
+  };
 
   return (
     <LinearGradient
@@ -104,18 +124,21 @@ export default function Index() {
                   },
                   styles.inputField,
                 ]}
+                value={title}
+                onChangeText={setTitle}
+                onSubmitEditing={TodoAdd}
               />
             </View>
-            <View
-              style={[
-                styles.inputButtonWrapper,
-                { backgroundColor: Colors.surface },
-              ]}
-            >
-              <TouchableOpacity activeOpacity={0.5}>
+            <TouchableOpacity activeOpacity={0.5} onPress={TodoAdd}>
+              <View
+                style={[
+                  styles.inputButtonWrapper,
+                  { backgroundColor: Colors.surface },
+                ]}
+              >
                 <Ionicons name="add" size={25} color={Colors.textSecondary} />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
