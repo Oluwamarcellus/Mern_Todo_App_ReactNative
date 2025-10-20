@@ -2,9 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useThemedColor from "../../Hooks/useThemedColor";
+import PreferenceCard from "../../components/PreferenceCard";
 import StatCard from "../../components/StatCard";
 import { getTodos } from "../../lib/appwrite";
 
@@ -57,33 +58,59 @@ export default function Index() {
           </Text>
         </View>
 
-        {/** SETTINGS SECTION */}
-        <View
-          style={[styles.statsContainer, { backgroundColor: Colors.surface }]}
-        >
-          <Text style={{ color: Colors.textPrimary, fontSize: 28 }}>
-            {" "}
-            Progress Stats
-          </Text>
-          <StatCard
-            name={"list"}
-            title={"Total Todos"}
-            val={todoTotal}
-            accent={Colors.primary}
-          />
-          <StatCard
-            name={"checkmark-done-circle-sharp"}
-            title={"Completed"}
-            val={todoCompleted}
-            accent={Colors.accent}
-          />
-          <StatCard
-            name={"alarm"}
-            title={"Active"}
-            val={todoActive}
-            accent={Colors.secondary}
-          />
-        </View>
+        {/** SETTINGS STATS */}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View
+            style={[styles.statsContainer, { backgroundColor: Colors.surface }]}
+          >
+            <Text style={{ color: Colors.textPrimary, fontSize: 28 }}>
+              Progress Stats
+            </Text>
+            <StatCard
+              name={"list"}
+              title={"Total Todos"}
+              val={todoTotal}
+              accent={Colors.primary}
+            />
+            <StatCard
+              name={"checkmark-done-circle-sharp"}
+              title={"Completed"}
+              val={todoCompleted}
+              accent={Colors.accent}
+            />
+            <StatCard
+              name={"alarm"}
+              title={"Active"}
+              val={todoActive}
+              accent={Colors.secondary}
+            />
+          </View>
+
+          {/** SETTINGS PREFERENCES */}
+          <View
+            style={[styles.statsContainer, { backgroundColor: Colors.surface }]}
+          >
+            <Text style={{ color: Colors.textPrimary, fontSize: 28 }}>
+              Preferences
+            </Text>
+
+            <PreferenceCard
+              name={"moon"}
+              title={"Dark Mode"}
+              accent={Colors.primary}
+            />
+            <PreferenceCard
+              name={"notifications"}
+              title={"Notifications"}
+              accent={Colors.secondary}
+            />
+            <PreferenceCard
+              name={"logo-buffer"}
+              title={"Todo Persist"}
+              accent={Colors.accent}
+            />
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -108,6 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginTop: 30,
     padding: 25,
-    gap: 20,
+    gap: 30,
+    paddingBottom: 40,
   },
 });
