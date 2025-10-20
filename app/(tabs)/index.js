@@ -20,6 +20,13 @@ export default function Index() {
   const [Colors] = useThemedColor();
   const [title, setTitle] = useState("");
   const [todos, setTodos] = useState([]);
+  const [todoCompleted, setTodoCompleted] = useState(0);
+
+  /** TODO Header Metrics */
+  const totalTodos = todos.length;
+  const completedTodos = todos.filter((todo) => todo.completed).length;
+  const completionPercentage =
+    totalTodos === 0 ? 0 : Math.round((completedTodos / totalTodos) * 100);
 
   /** Handles Todo Add */
   const TodoAdd = async () => {
@@ -87,7 +94,9 @@ export default function Index() {
                     { color: Colors.textSecondary },
                   ]}
                 >
-                  2 of 7 completed
+                  {totalTodos > 0
+                    ? `${completedTodos} of ${totalTodos} completed`
+                    : "No Tasks"}
                 </Text>
               </View>
             </View>
@@ -101,7 +110,7 @@ export default function Index() {
               <View
                 style={{
                   backgroundColor: Colors.accent,
-                  width: "29%",
+                  width: `${completionPercentage}%`,
                   height: "100%",
                   borderRadius: 10,
                 }}
@@ -114,7 +123,7 @@ export default function Index() {
                   fontSize: 18,
                 }}
               >
-                29%
+                {completionPercentage}%
               </Text>
             </View>
           </View>
