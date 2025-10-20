@@ -1,3 +1,6 @@
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -8,13 +11,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import useThemedColor from "./../../Hooks/useThemedColor";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { addTodo, getTodos } from "../../lib/appwrite";
-import { useEffect, useState } from "react";
 import TodoCard from "../../components/TodoCard";
+import { addTodo, getTodos } from "../../lib/appwrite";
+import useThemedColor from "./../../Hooks/useThemedColor";
 
 export default function Index() {
   const [Colors] = useThemedColor();
@@ -44,7 +44,6 @@ export default function Index() {
       try {
         const res = await getTodos();
         setTodos(res);
-        console.log(res);
       } catch (error) {
         console.error("Error fetching todos:", error);
       }

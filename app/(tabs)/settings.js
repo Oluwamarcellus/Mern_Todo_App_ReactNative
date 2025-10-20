@@ -1,11 +1,38 @@
-import { LinearGradient } from "expo-linear-gradient";
-import { StyleSheet, Text, View } from "react-native";
-import useThemedColor from "../../Hooks/useThemedColor";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import useThemedColor from "../../Hooks/useThemedColor";
+import StatCard from "../../components/StatCard";
+import { getTodos } from "../../lib/appwrite";
 
 export default function Index() {
+  const [todoTotal, setTodosTotal] = useState(0);
+  const [todoCompleted, setTodoCompleted] = useState(0);
+  const [todoActive, setTodoActive] = useState(0);
+
   const [Colors] = useThemedColor();
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    // Fetch todos from database when component mounts
+    const fetchTodos = async () => {
+      try {
+        const res = await getTodos();
+        setTodosTotal(res.length);
+        setTodoCompleted(res.filter((todo) => todo.completed).length);
+        setTodoActive(res.filter((todo) => !todo.completed).length);
+      } catch (error) {
+        console.error("Error fetching todos:", error);
+      }
+    };
+    if (isFocused) {
+    }
+    fetchTodos();
+  }, [isFocused]);
+
   return (
     <LinearGradient
       colors={[Colors.bgPrimary, Colors.bgSecondary]}
@@ -31,7 +58,32 @@ export default function Index() {
         </View>
 
         {/** SETTINGS SECTION */}
-        <View style={[styles.settingsContainer, { marginTop: 50 }]}></View>
+        <View
+          style={[styles.statsContainer, { backgroundColor: Colors.surface }]}
+        >
+          <Text style={{ color: Colors.textPrimary, fontSize: 28 }}>
+            {" "}
+            Progress Stats
+          </Text>
+          <StatCard
+            name={"list"}
+            title={"Total Todos"}
+            val={todoTotal}
+            accent={Colors.primary}
+          />
+          <StatCard
+            name={"checkmark-done-circle-sharp"}
+            title={"Completed"}
+            val={todoCompleted}
+            accent={Colors.accent}
+          />
+          <StatCard
+            name={"alarm"}
+            title={"Active"}
+            val={todoActive}
+            accent={Colors.secondary}
+          />
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -51,5 +103,11 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
+  },
+  statsContainer: {
+    borderRadius: 20,
+    marginTop: 30,
+    padding: 25,
+    gap: 20,
   },
 });
