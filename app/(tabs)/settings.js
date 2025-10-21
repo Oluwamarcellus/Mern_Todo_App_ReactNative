@@ -1,27 +1,77 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useIsFocused } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useThemedColor from "../../Hooks/useThemedColor";
 import PreferenceCard from "../../components/PreferenceCard";
 import StatCard from "../../components/StatCard";
-import { getTodos } from "../../lib/appwrite";
+import { useThemedColor } from "../../context/ThemeContest";
+import { useRefetch } from "../../context/TodoContest";
+import { useUser } from "../../context/UserContest";
+import { getTodos, resetUserTodos } from "../../lib/appwrite";
 
 export default function Index() {
   const [todoTotal, setTodosTotal] = useState(0);
   const [todoCompleted, setTodoCompleted] = useState(0);
   const [todoActive, setTodoActive] = useState(0);
 
-  const [Colors] = useThemedColor();
+  const { Colors, toggleTheme, theme } = useThemedColor();
+  const user = useUser();
   const isFocused = useIsFocused();
+  const { setShouldRefetch } = useRefetch();
+  const navigation = useNavigation();
+
+  const isDark = theme === "dark";
+
+  const reset = async () => {
+    await resetUserTodos(user.$id);
+    setShouldRefetch(true);
+    navigation.navigate("index");
+  };
+
+  const handleReset = async () => {
+    if (!user) {
+      Alert.alert("Error", "Session Lost");
+      return;
+    }
+    try {
+      Alert.alert(
+        "EMPTY TODOS",
+        "Are you suure you want to remove all todos?",
+        [
+          {
+            text: "No",
+            style: "cancel",
+          },
+          {
+            text: "Yes",
+            style: "destructive",
+            onPress: reset,
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Error fetching todos:", error);
+    }
+  };
 
   useEffect(() => {
     // Fetch todos from database
     const fetchTodos = async () => {
+      if (!user) {
+        Alert.alert("Error", "Session Lost");
+        return;
+      }
       try {
-        const res = await getTodos();
+        const res = await getTodos(user.$id);
         setTodosTotal(res.length);
         setTodoCompleted(res.filter((todo) => todo.completed).length);
         setTodoActive(res.filter((todo) => !todo.completed).length);
@@ -32,7 +82,7 @@ export default function Index() {
     if (isFocused) {
     }
     fetchTodos();
-  }, [isFocused]);
+  }, [isFocused, user]);
 
   return (
     <LinearGradient
@@ -60,9 +110,7 @@ export default function Index() {
 
         {/** SETTINGS STATS */}
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View
-            style={[styles.statsContainer, { backgroundColor: Colors.surface }]}
-          >
+          <View style={[styles.container, { backgroundColor: Colors.surface }]}>
             <Text style={{ color: Colors.textPrimary, fontSize: 28 }}>
               Progress Stats
             </Text>
@@ -87,9 +135,7 @@ export default function Index() {
           </View>
 
           {/** SETTINGS PREFERENCES */}
-          <View
-            style={[styles.statsContainer, { backgroundColor: Colors.surface }]}
-          >
+          <View style={[styles.container, { backgroundColor: Colors.surface }]}>
             <Text style={{ color: Colors.textPrimary, fontSize: 28 }}>
               Preferences
             </Text>
@@ -98,6 +144,7 @@ export default function Index() {
               name={"moon"}
               title={"Dark Mode"}
               accent={Colors.primary}
+              switching={{ value: isDark, fn: toggleTheme }}
             />
             <PreferenceCard
               name={"notifications"}
@@ -109,6 +156,30 @@ export default function Index() {
               title={"Todo Persist"}
               accent={Colors.accent}
             />
+          </View>
+
+          {/** DELETE ALL TODO */}
+          <View style={[styles.container, { backgroundColor: Colors.surface }]}>
+            <Text style={{ color: Colors.delete, fontSize: 22 }}>
+              Danger Zone
+            </Text>
+
+            <TouchableOpacity onPress={handleReset}>
+              <View style={styles.resetContainer}>
+                <View
+                  style={[
+                    styles.iconWrapper,
+                    { backgroundColor: Colors.delete },
+                  ]}
+                >
+                  <Ionicons name="trash-bin" color="#fff" size={16} />
+                </View>
+
+                <Text style={{ color: Colors.textPrimary, fontSize: 20 }}>
+                  Reset App
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -131,11 +202,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  statsContainer: {
+  container: {
     borderRadius: 20,
     marginTop: 30,
     padding: 25,
     gap: 30,
     paddingBottom: 40,
+  },
+
+  resetContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+  },
+  iconWrapper: {
+    height: 40,
+    width: 40,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

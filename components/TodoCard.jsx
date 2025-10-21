@@ -1,28 +1,38 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-} from "react-native";
 import { useState } from "react";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import useThemedColor from "../Hooks/useThemedColor";
-import { toggleTodoCompletion, deleteTodo, updateTodo } from "../lib/appwrite";
+import { useThemedColor } from "../context/ThemeContest";
+import { deleteTodo, toggleTodoCompletion, updateTodo } from "../lib/appwrite";
+import { useUser } from "./../context/UserContest";
 
 const TodoCard = ({ todo, setTodos }) => {
-  const [Colors] = useThemedColor();
+  const { Colors } = useThemedColor();
   const [editingId, setEditingId] = useState("");
   const [newTitle, setNewTitle] = useState(todo.title);
+
+  const user = useUser();
 
   //Toggle todo completion with debounce
   let debounce;
   const handleToggle = async () => {
+    if (!user) {
+      Alert.alert("Error", "Session Lost");
+      return;
+    }
+    if (user.$id !== todo.userId) return;
+
     try {
       // The debounce logic prevents multiple rapid toggle calls
       // when user taps quickly
+
       if (debounce) clearTimeout(debounce);
       debounce = setTimeout(async () => {
         const res = await toggleTodoCompletion(todo.$id, !todo.completed);
@@ -36,6 +46,12 @@ const TodoCard = ({ todo, setTodos }) => {
 
   // Handle todo deletion
   const handleDelete = async () => {
+    if (!user) {
+      Alert.alert("Error", "Session Lost");
+      return;
+    }
+    if (user.$id !== todo.userId) return;
+
     try {
       await deleteTodo(todo.$id);
       setTodos((prev) => prev.filter((p) => p.$id !== todo.$id));
@@ -47,6 +63,12 @@ const TodoCard = ({ todo, setTodos }) => {
 
   //Handle todo edit
   const handleEdit = async () => {
+    if (!user) {
+      Alert.alert("Error", "Session Lost");
+      return;
+    }
+    if (user.$id !== todo.userId) return;
+
     if (newTitle.trim() === todo.title.trim() || !newTitle.trim()) {
       setEditingId("");
       return;
@@ -68,7 +90,11 @@ const TodoCard = ({ todo, setTodos }) => {
         <View
           style={[
             styles.completedBar,
-            { backgroundColor: todo.completed ? Colors.accent : "#334155" },
+            {
+              backgroundColor: todo.completed
+                ? Colors.accent
+                : Colors.bgSecondary,
+            },
           ]}
         >
           <Ionicons

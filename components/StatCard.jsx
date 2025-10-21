@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
-import useThemedColor from "../Hooks/useThemedColor";
+import { useThemedColor } from "../context/ThemeContest";
 
 const StatCard = ({ accent, name, val, title }) => {
-  const [Colors] = useThemedColor();
+  const { Colors } = useThemedColor();
   return (
     <View
       style={[

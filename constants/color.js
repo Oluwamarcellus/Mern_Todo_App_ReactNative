@@ -29,11 +29,11 @@ export const lightTheme = {
   primary: "#0560b8", // slightly deeper blue for less glare
   secondary: "#F59E0B", // same - perfect golden accent
   accent: "#16A34A", // slightly darker green, better text contrast
-  bgPrimary: "#FFFFFF", // pure white for clean background
+  bgPrimary: "#e6eff3ff", // pure white for clean background
   bgSecondary: "#E2E8F0", // lighter gray-blue (more separation from bg)
   surface: "#F1F5F9", // softer, diffused card/surface tone
   textPrimary: "#0F172A", // unchanged - excellent readability
-  textSecondary: "#475569", // unchanged
+  textSecondary: "#606770ff", // unchanged
   delete: "#DC2626", // slightly stronger red for clear warning
   outline: "#CBD5E1", // softer gray for dividers and borders
 };

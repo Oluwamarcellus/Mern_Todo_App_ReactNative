@@ -13,14 +13,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TodoCard from "../../components/TodoCard";
+import { useThemedColor } from "../../context/ThemeContest";
+import { useRefetch } from "../../context/TodoContest";
 import { addTodo, getTodos } from "../../lib/appwrite";
-import useThemedColor from "./../../Hooks/useThemedColor";
+import { useUser } from "./../../context/UserContest";
 
 export default function Index() {
-  const [Colors] = useThemedColor();
+  const { Colors } = useThemedColor();
   const [title, setTitle] = useState("");
   const [todos, setTodos] = useState([]);
-  const [todoCompleted, setTodoCompleted] = useState(0);
+  const { shouldRefetch, setShouldRefetch } = useRefetch();
+
+  const user = useUser();
 
   /** TODO Header Metrics */
   const totalTodos = todos.length;
@@ -31,11 +35,15 @@ export default function Index() {
   /** Handles Todo Add */
   const TodoAdd = async () => {
     Keyboard.dismiss();
+    if (!user) {
+      Alert.alert("Error", "Session Lost");
+      return;
+    }
     if (!title.trim()) {
       Alert.alert("Error", "Todo title cannot be empty");
     } else {
       try {
-        const res = await addTodo(title);
+        const res = await addTodo(title, user.$id);
         setTitle("");
         setTodos((prev) => [res, ...prev]);
       } catch (error) {
@@ -48,16 +56,23 @@ export default function Index() {
   useEffect(() => {
     // Fetch todos from database when component mounts
     const fetchTodos = async () => {
+      if (!user) {
+        Alert.alert("Error", "Session Lost");
+        return;
+      }
       try {
-        const res = await getTodos();
+        const res = await getTodos(user.$id);
         setTodos(res);
+        setShouldRefetch(false);
       } catch (error) {
         console.error("Error fetching todos:", error);
       }
     };
 
-    fetchTodos();
-  }, []);
+    if (user && (shouldRefetch || todos.length === 0)) {
+      fetchTodos();
+    }
+  }, [user, shouldRefetch]);
 
   return (
     <LinearGradient
