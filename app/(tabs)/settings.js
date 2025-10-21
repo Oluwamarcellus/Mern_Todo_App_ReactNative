@@ -18,7 +18,7 @@ export default function Index() {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    // Fetch todos from database when component mounts
+    // Fetch todos from database
     const fetchTodos = async () => {
       try {
         const res = await getTodos();
