@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TodoCard from "../../components/TodoCard";
+import TodoEmpty from "../../components/TodoEmpty";
 import { useThemedColor } from "../../context/ThemeContest";
 import { useRefetch } from "../../context/TodoContest";
 import { addTodo, getTodos } from "../../lib/appwrite";
@@ -192,6 +193,7 @@ export default function Index() {
             paddingTop: 20,
           }}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<TodoEmpty />}
         />
       </SafeAreaView>
     </LinearGradient>
