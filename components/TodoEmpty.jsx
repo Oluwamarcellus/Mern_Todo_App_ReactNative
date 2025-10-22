@@ -9,7 +9,7 @@ const TodoEmpty = () => {
     <View style={[styles.container, { backgroundColor: Colors.surface }]}>
       <MaterialIcons
         name="format-list-bulleted-add"
-        size={300}
+        size={250}
         color={Colors.textSecondary}
         style={{ opacity: 0.5 }}
       />
