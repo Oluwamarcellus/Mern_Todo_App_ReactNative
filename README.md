@@ -53,10 +53,10 @@ It was built as part of my learning journey into mobile development and backend 
 1.	Go to your Appwrite Dashboard.
 2.	Create a new project.
 3.	Add a database and collection for Todos.
-4.	Inside the collection, create the following attributes:
-	•	title → String
-	•	completed → Boolean
-	•	userId → String
+4.	Inside the collection, create the following attributes: 
+  - title → String
+  - completed → Boolean
+  - userId → String
 5.	Note your Project ID and API Endpoint.
 
 #### 4. Configure Environment Variables
